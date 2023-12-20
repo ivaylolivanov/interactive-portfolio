@@ -10,7 +10,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 // Define the rectangle properties
-const squareSize = 50;
+const squareSize = 128;
 const playerColor = '#00FF00'; // Green color
 
 let horizontalInputAxis = 0;
@@ -111,6 +111,8 @@ function drawPlayer()
     context.fillRect(player.position.x, player.position.y, squareSize, squareSize);
 }
 
+let animationFrame = 0;
+let animationDelay = 0;
 function update()
 {
     // Clear the canvas
@@ -129,19 +131,35 @@ function update()
     player.applyGravity(gameTime.deltaTime);
     player.limitToScreen(frameStartPlayerPosition);
 
-    drawPlayer();
+    context.drawImage(
+        playerSpriteSheet,
+        64 * animationFrame, 0,
+        64, 64,
+        player.position.x + 32, player.position.y + 32,
+        squareSize, squareSize
+    );
+
+    if (animationDelay % 20 == 0)
+        ++animationFrame;
+
+    if (animationFrame > 5)
+        animationFrame = 0;
+
+    ++animationDelay;
+    // drawPlayer();
 
     gameTime.frameEnd = performance.now();
     // Call the next frame
     requestAnimationFrame(update);
 }
 
-
-
 document.addEventListener('keydown', handleKeyDown);
 document.addEventListener('keyup', handleKeyUp);
 
 let gameTime = new Time();
 let player = new Player(startingPosition);
+
+const playerSpriteSheet = new Image();
+playerSpriteSheet.src = "./mage-spritesheet.png";
 
 requestAnimationFrame(update);
